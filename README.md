@@ -5,9 +5,6 @@ This Google+ iOS SDK allows users to sign in with Google+, share with Google+,
 and write moments to Google+ history from third-party apps. The SDK contains the
 following files:
 
-Changelog
-> The versions and changes of the SDK.
-
 lib/ - <b>Header files and libraries.</b>
 > GPPDeepLink.h -- Header file to include for sharing with Google+ with content
                    deep linking.<br />
