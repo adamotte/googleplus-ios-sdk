@@ -17,13 +17,20 @@
 //  GTMHTTPFetchHistory.m
 //
 
-#define GTMHTTPFETCHHISTORY_DEFINE_GLOBALS 1
-
 #import "GTMHTTPFetchHistory.h"
 
 const NSTimeInterval kCachedURLReservationInterval = 60.0; // 1 minute
 static NSString* const kGTMIfNoneMatchHeader = @"If-None-Match";
 static NSString* const kGTMETagHeader = @"Etag";
+
+#if GTM_IPHONE
+// iPhone: up to 1MB memory
+const NSUInteger kGTMDefaultETaggedDataCacheMemoryCapacity = 1 * 1024 * 1024;
+#else
+// Mac OS X: up to 15MB memory
+const NSUInteger kGTMDefaultETaggedDataCacheMemoryCapacity = 15 * 1024 * 1024;
+#endif
+
 
 @implementation GTMCookieStorage
 
@@ -183,13 +190,13 @@ static NSString* const kGTMETagHeader = @"Etag";
 - (void)removeExpiredCookies {
 
   // count backwards since we're deleting items from the array
-  for (NSInteger idx = [cookies_ count] - 1; idx >= 0; idx--) {
+  for (NSInteger idx = (NSInteger)[cookies_ count] - 1; idx >= 0; idx--) {
 
-    NSHTTPCookie *storedCookie = [cookies_ objectAtIndex:idx];
+    NSHTTPCookie *storedCookie = [cookies_ objectAtIndex:(NSUInteger)idx];
 
     NSDate *expiresDate = [storedCookie expiresDate];
     if (expiresDate && [expiresDate timeIntervalSinceNow] < 0) {
-      [cookies_ removeObjectAtIndex:idx];
+      [cookies_ removeObjectAtIndex:(NSUInteger)idx];
     }
   }
 }

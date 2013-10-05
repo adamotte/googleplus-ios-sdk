@@ -5,14 +5,9 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>${PRODUCT_NAME}</string>
+	<string>G+ Sample</string>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
-	<key>CFBundleIconFiles</key>
-	<array>
-		<string>Icon.png</string>
-		<string>Icon@2x.png</string>
-	</array>
 	<key>CFBundleIcons</key>
 	<dict>
 		<key>CFBundlePrimaryIcon</key>
@@ -20,6 +15,8 @@
 			<key>CFBundleIconFiles</key>
 			<array>
 				<string>Icon.png</string>
+				<string>Icon-72.png</string>
+				<string>Icon-144.png</string>
 				<string>Icon@2x.png</string>
 			</array>
 		</dict>
