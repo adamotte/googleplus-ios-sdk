@@ -1,3 +1,7 @@
+#if !defined(__has_feature) || !__has_feature(objc_arc)
+#error "This file requires ARC support."
+#endif
+
 #import "DataPickerState.h"
 #import "DataPickerViewController.h"
 
@@ -35,9 +39,14 @@
                                   reuseIdentifier:kCellIdentifier];
   }
 
-  cell.textLabel.text = self.dataState.cellLabels[indexPath.row];
+  NSDictionary *cellLabelDict = self.dataState.cellLabels[indexPath.row];
+  NSString *cellLabelText = cellLabelDict[kLabelKey];
+  if ([cellLabelDict objectForKey:kShortLabelKey]) {
+    cellLabelText = [cellLabelDict objectForKey:kShortLabelKey];
+  }
+  cell.textLabel.text = cellLabelText;
   // If the cell is selected, mark it as checked
-  if ([self.dataState.selectedCells containsObject:cell.textLabel.text]) {
+  if ([self.dataState.selectedCells containsObject:cellLabelDict[kLabelKey]]) {
     cell.accessoryType = UITableViewCellAccessoryCheckmark;
   } else {
     cell.accessoryType = UITableViewCellAccessoryNone;
@@ -50,7 +59,8 @@
 - (void)tableView:(UITableView *)tableView
     didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
   UITableViewCell *selectedCell = [tableView cellForRowAtIndexPath:indexPath];
-  NSString *label = selectedCell.textLabel.text;
+  NSDictionary *selectedCellDict = _dataState.cellLabels[indexPath.row];
+  NSString *label = selectedCellDict[kLabelKey];
 
   if (self.dataState.multipleSelectEnabled) {
     // If multiple selections are allowed, then toggle the state

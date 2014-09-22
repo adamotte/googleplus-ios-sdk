@@ -1,3 +1,21 @@
+//
+//  ShareConfiguration.h
+//
+//  Copyright 2013 Google Inc.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
 #import "DataPickerState.h"
 
 // This class offers a shared instance that maintains the current set of configuration settings
@@ -42,6 +60,9 @@
 
 // Returns shared instance of |ShareConfiguration| class.
 + (ShareConfiguration *)sharedInstance;
+
+// Resets the shared instance of |ShareConfiguration| class.
++ (void)reset;
 
 // Returns dictionary of information describing cell at |indexPath|. The |section| property of
 // |indexPath| refers to which type of share option it describes (general share, deep link, or

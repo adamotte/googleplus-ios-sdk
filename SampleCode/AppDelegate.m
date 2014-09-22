@@ -30,7 +30,7 @@
 // DO NOT USE THIS CLIENT ID. IT WILL NOT WORK FOR YOUR APP.
 // Please use the client ID created for you by Google.
 static NSString * const kClientID =
-    @"452265719636.apps.googleusercontent.com";
+    @"452265719636-qbqmhro0t3j9jip1npl69a3er7biidd2.apps.googleusercontent.com";
 
 #pragma mark Object life-cycle.
 

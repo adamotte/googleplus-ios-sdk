@@ -1,5 +1,5 @@
 //
-//  GooglePlusSamplePeopleListViewController.h
+//  ListViewController.h
 //
 //  Copyright 2012 Google Inc.
 //

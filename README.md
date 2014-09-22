@@ -32,6 +32,27 @@ SampleCode/  -- Sample code for your reference only.
 Changelog
 =============================
 
+2014-09-12  -- v1.7.1
+- Bug fixes
+
+2014-05-22  -- v1.7.0
+- Support for one-time authorization code
+- Fixed bug where OAuth token sometimes expires without being able to refresh
+- Other bug fixes
+
+2014-01-28  -- v1.5.1
+- Allow using the reversed client ID for redirect URL scheme to sign in
+
+2013-12-12  -- v1.5.0
+- Suggested recipients based on affinity and relevance
+- Sharing to all Google contacts
+- Comprehensive list of contacts for search
+- Allow users to add people they are sharing with to a circle
+- Bug fixes
+
+2013-10-09  -- v1.4.1
+- Bug fixes
+
 2013-09-30  -- v1.4.0
 - Native sharebox
 - ID token support

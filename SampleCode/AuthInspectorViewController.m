@@ -18,6 +18,7 @@
 
 #import "AuthInspectorViewController.h"
 
+#import "Availability.h"
 #import <GoogleOpenSource/GoogleOpenSource.h>
 #import <GooglePlus/GooglePlus.h>
 
@@ -95,8 +96,7 @@ static CGFloat const kTableViewCellPadding = 22.f;
   return cell;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView
-    heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
   NSString *key = [_fields objectAtIndex:indexPath.section];
 
   // Make an |NSString|, since the values can be any |NSObject|.
@@ -105,8 +105,26 @@ static CGFloat const kTableViewCellPadding = 22.f;
   // How will this fit within our table view cell?
   CGSize constraintSize =
       CGSizeMake(tableView.frame.size.width - 2 * kTableViewCellPadding, kVeryTallConstraint);
-  CGSize size = [value sizeWithFont:[UIFont systemFontOfSize:kTableViewCellFontSize]
-                  constrainedToSize:constraintSize];
+  CGSize size;
+  UIFont *font = [UIFont systemFontOfSize:kTableViewCellFontSize];
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 70000
+  if ([value respondsToSelector:@selector(boundingRectWithSize:options:attributes:context:)]) {
+    NSDictionary *attributes = @{ NSFontAttributeName : font };
+    size = [value boundingRectWithSize:constraintSize
+                               options:0
+                            attributes:attributes
+                               context:NULL].size;
+  } else {
+    // Using the deprecated method as this instance doesn't respond to the new method since this is
+    // running on an older OS version.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    size = [value sizeWithFont:font constrainedToSize:constraintSize];
+#pragma clang diagnostic pop
+  }
+#else
+  size = [value sizeWithFont:font constrainedToSize:constraintSize];
+#endif
   return size.height + kTableViewCellPadding;
 }
 

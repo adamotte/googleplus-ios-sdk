@@ -38,25 +38,18 @@ static NSString * const kNibNames[kNumViewControllers] = {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
     self.title = @"Google+ SDK Sample";
-    UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
-        initWithTitle:@"Back"
-                style:UIBarButtonItemStylePlain
-               target:self
-               action:@selector(backPressed)];
-    self.navigationItem.backBarButtonItem = backButton;
   }
   return self;
 }
 
 #pragma mark - View lifecycle
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)
-    interfaceOrientation {
-  if ([[UIDevice currentDevice] userInterfaceIdiom] ==
-      UIUserInterfaceIdiomPhone) {
-    return interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown;
+- (NSUInteger)supportedInterfaceOrientations {
+  if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+    return UIInterfaceOrientationMaskAllButUpsideDown;
+  } else {
+    return UIInterfaceOrientationMaskAll;
   }
-  return YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated {

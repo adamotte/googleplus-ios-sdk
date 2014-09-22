@@ -179,7 +179,7 @@ enum sections {
     cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
                                   reuseIdentifier:kCellIdentifier];
     cell.textLabel.adjustsFontSizeToFitWidth = YES;
-    cell.textLabel.minimumFontSize = 0;
+    cell.textLabel.minimumScaleFactor = 0;
   }
 
   if (indexPath.section == kActivityTypeSection) {

@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Google Inc.
+/* Copyright (c) 2014 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,13 @@
 #import "GTLPlusConstants.h"
 
 // Authorization scope
-NSString * const kGTLAuthScopePlusLogin = @"https://www.googleapis.com/auth/plus.login";
-NSString * const kGTLAuthScopePlusMe    = @"https://www.googleapis.com/auth/plus.me";
+NSString * const kGTLAuthScopePlusLogin           = @"https://www.googleapis.com/auth/plus.login";
+NSString * const kGTLAuthScopePlusMe              = @"https://www.googleapis.com/auth/plus.me";
+NSString * const kGTLAuthScopePlusUserinfoEmail   = @"https://www.googleapis.com/auth/userinfo.email";
+NSString * const kGTLAuthScopePlusUserinfoProfile = @"https://www.googleapis.com/auth/userinfo.profile";
 
 // Collection
+NSString * const kGTLPlusCollectionConnected = @"connected";
 NSString * const kGTLPlusCollectionPlusoners = @"plusoners";
 NSString * const kGTLPlusCollectionPublic    = @"public";
 NSString * const kGTLPlusCollectionResharers = @"resharers";

@@ -133,8 +133,10 @@ static NSString *const kJSONKey = @"jsonKey";
     result = [dateTime stringValue];
   } else {
     checkExpected = NO;
-    GTL_DEBUG_LOG(@"GTLRuntimeCommon: unsupported class '%s' in jsonFromAPIObject",
-                  class_getName([obj class]));
+    if (obj) {
+      GTL_DEBUG_LOG(@"GTLRuntimeCommon: unsupported class '%s' in jsonFromAPIObject",
+                    class_getName([obj class]));
+    }
   }
 
   if (checkExpected) {
@@ -261,7 +263,7 @@ static CFStringRef SelectorKeyCopyDescriptionCallBack(const void *key) {
 
 #pragma mark IMPs - getters and setters for specific object types
 
-#if !__LP64__
+#if !defined(__LP64__) || !__LP64__
 
 // NSInteger on 32bit
 static NSInteger DynamicInteger32Getter(id self, SEL sel) {
@@ -920,7 +922,7 @@ static const GTLDynamicImpInfo *DynamicImpInfoForProperty(objc_property_t prop,
 
 
   static GTLDynamicImpInfo kImplInfo[] = {
-#if !__LP64__
+#if !defined(__LP64__) || !__LP64__
     { // NSInteger on 32bit
       "Ti",
       "v@:i", (IMP)DynamicInteger32Setter,
@@ -966,7 +968,7 @@ static const GTLDynamicImpInfo *DynamicImpInfoForProperty(objc_property_t prop,
     },
 // This conditional matches the one in iPhoneOS.platform version of
 // <objc/objc.h> that controls the definition of BOOL.
-#if !defined(OBJC_HIDE_64) && TARGET_OS_IPHONE && __LP64__
+#if !defined(OBJC_HIDE_64) && TARGET_OS_IPHONE && (defined(__LP64__) && __LP64__)
     { // BOOL as bool
       "TB",
       "v@:B", (IMP)DynamicBooleanSetter,

@@ -103,11 +103,12 @@ static NSString * const kAttachAssetFromBundleDrilldownLabel = @"Attach asset fr
 
   // The right bar button item launches the share sheet, which includes
   // a G+ share icon.
-  self.navigationItem.rightBarButtonItem =
-      [[UIBarButtonItem alloc]
-          initWithBarButtonSystemItem:UIBarButtonSystemItemAction
-                               target:self
-                               action:@selector(shareSheetButton:)];
+  UIBarButtonItem *rightBarButtonItem =
+      [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
+                                                    target:self
+                                                    action:@selector(shareSheetButton:)];
+  rightBarButtonItem.accessibilityLabel = @"share_sheet_button";
+  self.navigationItem.rightBarButtonItem = rightBarButtonItem;
 
   // If we are not logged in, then call-to-action is disabled.
   if (![GPPSignIn sharedInstance].authentication ||
@@ -204,7 +205,6 @@ static NSString * const kAttachAssetFromBundleDrilldownLabel = @"Attach asset fr
   }
 
   cell.textLabel.adjustsFontSizeToFitWidth = YES;
-  cell.textLabel.minimumFontSize = 10;
   cell.textLabel.text = label;
   return cell;
 }
@@ -255,7 +255,7 @@ static NSString * const kAttachAssetFromBundleDrilldownLabel = @"Attach asset fr
                              animated:YES];
       _assetLibraryPopover = popover;
     } else {
-      [self presentModalViewController:picker animated:YES];
+      [self presentViewController:picker animated:YES completion:nil];
     }
   } else if ([cell.textLabel.text isEqualToString:kAttachAssetFromBundleDrilldownLabel]) {
     ShareBundleMediaPickerController *picker =
@@ -282,6 +282,7 @@ static NSString * const kAttachAssetFromBundleDrilldownLabel = @"Attach asset fr
     // To identify it in the delegate method, we mark which section |textView| was activated from.
     textView.tag = indexPath.section;
     textView.delegate = self;
+    textView.accessibilityIdentifier = @"share_view_text_view";
 
     viewController.view = textView;
     viewController.navigationItem.title = [_shareConfiguration labelForCellAtIndexPath:indexPath];
@@ -476,6 +477,8 @@ static NSString * const kAttachAssetFromBundleDrilldownLabel = @"Attach asset fr
   // Associate this text field with its property in |_shareConfiguration|.
   editableCell.associatedProperty = [_shareConfiguration propertyForCellAtIndexPath:indexPath];
   editableCell.associatedPropertyOwner = _shareConfiguration;
+  editableCell.textField.accessibilityIdentifier = [NSString stringWithFormat:@"%@ text_field",
+                                                    editableCell.associatedProperty];
   return editableCell;
 }
 
@@ -523,6 +526,8 @@ static NSString * const kAttachAssetFromBundleDrilldownLabel = @"Attach asset fr
                      action:@selector(toggleURLEnabled:)
            forControlEvents:UIControlEventValueChanged];
   }
+
+  toggleSwitch.accessibilityIdentifier = [NSString stringWithFormat:@"%@ switch", label];
   return cell;
 }
 
@@ -553,7 +558,7 @@ static NSString * const kAttachAssetFromBundleDrilldownLabel = @"Attach asset fr
     [_assetLibraryPopover dismissPopoverAnimated:YES];
     _assetLibraryPopover = nil;
   } else {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
   }
 }
 

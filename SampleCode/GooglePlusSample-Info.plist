@@ -39,10 +39,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.google.GooglePlusSample</string>
+			<string>com.google.GooglePlusPlatformSample</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.google.GooglePlusSample</string>
+				<string>com.google.GooglePlusPlatformSample</string>
 			</array>
 		</dict>
 	</array>

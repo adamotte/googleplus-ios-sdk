@@ -150,6 +150,12 @@ enum {
 // |setTitle:description:thumbnailURL:|.
 - (id<GPPNativeShareBuilder>)attachImage:(UIImage *)imageAttachment;
 
+// Attaches an image to be shared, created from @param |imageData|. This should be used only if
+// there is metadata attached to the image that should be preserved. If there is an existing media
+// attachment, it is replaced. If @param |imageData| is nil, return nil. This method cannot be
+// called in combination with either |setURLToShare:| or |setTitle:description:thumbnailURL:|.
+- (id<GPPNativeShareBuilder>)attachImageData:(NSData *)imageData;
+
 // Attaches a video to be shared. If there is an existing media attachment, it is replaced.
 // The video URL should be a local URL referencing a file on the device. If the URL is invalid,
 // this method does nothing and returns nil.
@@ -186,7 +192,7 @@ enum {
 // create the dialog after setting the parameters as needed.
 // Before the native share dialog can be opened, the user must have consented to the OAuth2 scope
 // "https://www.googleapis.com/auth/plus.login".
-- (id<GPPShareBuilder>)nativeShareDialog;
+- (id<GPPNativeShareBuilder>)nativeShareDialog;
 
 // Closes the active native share dialog immediately, if one exists.
 // Note that it is usually not necessary to call this method, as the sharebox closes itself

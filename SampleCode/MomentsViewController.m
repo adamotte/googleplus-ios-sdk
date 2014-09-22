@@ -16,12 +16,12 @@
 //  limitations under the License.
 //
 
-#import "AddMomentsViewController.h"
-#import "MomentDetailViewController.h"
 #import "MomentsViewController.h"
 
+#import "AddMomentsViewController.h"
 #import <GoogleOpenSource/GoogleOpenSource.h>
 #import <GooglePlus/GooglePlus.h>
+#import "MomentDetailViewController.h"
 
 @interface MomentsViewController ()
 
@@ -66,15 +66,6 @@
 }
 
 #pragma mark - View lifecycle
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)
-    interfaceOrientation {
-  if ([[UIDevice currentDevice] userInterfaceIdiom] ==
-      UIUserInterfaceIdiomPhone) {
-    return interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown;
-  }
-  return YES;
-}
 
 - (void)viewWillAppear:(BOOL)animated {
   [self refreshData];

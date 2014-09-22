@@ -23,6 +23,8 @@
 #import <UIKit/UIKit.h>
 #endif
 
+#import <sys/utsname.h>
+
 static id <GTMCookieStorageProtocol> gGTMFetcherStaticCookieStorage = nil;
 static Class gGTMFetcherConnectionClass = nil;
 
@@ -44,6 +46,9 @@ static const NSTimeInterval kDefaultMaxDownloadRetryInterval = 60.0;
 static const NSTimeInterval kDefaultMaxUploadRetryInterval = 60.0 * 10.;
 
 // delegateQueue callback parameters
+static NSString *const kCallbackTarget = @"target";
+static NSString *const kCallbackSelector = @"sel";
+static NSString *const kCallbackBlock = @"block";
 static NSString *const kCallbackData = @"data";
 static NSString *const kCallbackError = @"error";
 
@@ -84,12 +89,18 @@ static NSString *const kCallbackError = @"error";
 
 - (void)invokeFetchCallbacksWithData:(NSData *)data
                                error:(NSError *)error;
+- (void)invokeFetchCallbacksWithTarget:(id)target
+                              selector:(SEL)sel
+                                 block:(id)block
+                                  data:(NSData *)data
+                                 error:(NSError *)error;
 - (void)invokeFetchCallback:(SEL)sel
                      target:(id)target
                        data:(NSData *)data
                       error:(NSError *)error;
 - (void)invokeFetchCallbacksOnDelegateQueueWithData:(NSData *)data
                                               error:(NSError *)error;
+- (void)invokeOnQueueWithDictionary:(NSDictionary *)dict;
 - (void)releaseCallbacks;
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error;
@@ -217,6 +228,7 @@ static NSString *const kCallbackError = @"error";
   [serviceHost_ release];
   [thread_ release];
   [retryTimer_ release];
+  [initialRequestDate_ release];
   [comment_ release];
   [log_ release];
 #if !STRIP_GTM_FETCH_LOGGING
@@ -260,10 +272,68 @@ static NSString *const kCallbackError = @"error";
     goto CannotBeginFetch;
   }
 
-  if (request_ == nil || [request_ URL] == nil) {
+  NSURL *requestURL = [request_ URL];
+  if (request_ == nil || requestURL == nil) {
     NSAssert(request_ != nil, @"beginFetchWithDelegate requires a request with a URL");
     goto CannotBeginFetch;
   }
+
+#if !GTM_ALLOW_INSECURE_REQUESTS
+  if (requestURL != nil) {
+    // Allow https only for requests, unless overridden by the client.
+    //
+    // Non-https requests may too easily be snooped, so we disallow them by default.
+    //
+    // file: and data: schemes are usually safe if they are hardcoded in the client or provided
+    // by a trusted source, but since it's fairly rare to need them, it's safest to make clients
+    // explicitly whitelist them.
+    NSString *requestScheme = [requestURL scheme];
+    BOOL isSecure = ([requestScheme caseInsensitiveCompare:@"https"] == NSOrderedSame);
+    if (!isSecure) {
+      BOOL allowRequest = NO;
+      NSString *host = [requestURL host];
+      BOOL isLocalhost = ([host caseInsensitiveCompare:@"localhost"] == NSOrderedSame
+                          || [host isEqual:@"::1"]
+                          || [host isEqual:@"127.0.0.1"]);
+      if (isLocalhost) {
+        if (allowLocalhostRequest_) {
+          allowRequest = YES;
+        } else {
+          // To fetch from localhost, the fetcher must specifically have the allowLocalhostRequest
+          // property set.
+#if DEBUG
+          NSAssert(NO, @"Fetch request for localhost but fetcher allowLocalhostRequest"
+                       @" is not set: %@", requestURL);
+#else
+          NSLog(@"Localhost fetch disallowed for %@", requestURL);
+#endif
+        }
+      } else {
+        // Not localhost; check schemes.
+        for (NSString *allowedScheme in allowedInsecureSchemes_) {
+          if ([requestScheme caseInsensitiveCompare:allowedScheme] == NSOrderedSame) {
+            allowRequest = YES;
+            break;
+          }
+        }
+        if (!allowRequest) {
+          // To make a request other than https:, the client must specify an array for the
+          // allowedInsecureSchemes property.
+#if DEBUG
+          NSAssert(NO, @"Insecure fetch request has a scheme (%@)"
+                       @" not found in fetcher allowedInsecureSchemes (%@): %@",
+                       requestScheme, allowedInsecureSchemes_, requestURL);
+#else
+          NSLog(@"Fetch disallowed for %@", requestURL);
+#endif
+        }
+      }
+      if (!allowRequest) {
+        goto CannotBeginFetch;
+      }
+    }  // !isSecure
+  }  // requestURL != nil
+#endif  // GTM_ALLOW_INSECURE_REQUESTS
 
   self.downloadedData = nil;
   downloadedLength_ = 0;
@@ -352,6 +422,15 @@ static NSString *const kCallbackError = @"error";
     // NSURLConnection has no setDelegateQueue: on iOS 4 and Mac OS X 10.5.
     delegateQueue = nil;
     self.delegateQueue = nil;
+  } else if (delegateQueue == nil && runLoopModes_ == nil && ![NSThread isMainThread]) {
+    // Neither a delegate queue nor runLoopModes were supplied, and we're not on the
+    // main thread, so assume the user really wants callbacks and provide a queue.
+    //
+    // We don't have a way to verify that this thread has a run loop spinning, but
+    // it's fairly rare that a background thread does have one.  A client that
+    // does want to rely on spinning a run loop should specify run loop modes.
+    delegateQueue = [NSOperationQueue mainQueue];
+    self.delegateQueue = delegateQueue;
   }
 
 #if DEBUG && TARGET_OS_IPHONE
@@ -423,6 +502,17 @@ static NSString *const kCallbackError = @"error";
         }
       }];
     }
+  }
+#endif
+
+  if (!initialRequestDate_) {
+    initialRequestDate_ = [[NSDate alloc] init];
+  }
+
+#if DEBUG
+  // For testing only, look for a property indicating the fetch should immediately fail.
+  if ([self propertyForKey:@"_CannotBeginFetch"] != nil) {
+    goto CannotBeginFetch;
   }
 #endif
 
@@ -958,6 +1048,8 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
   SEL sel;
 #if NS_BLOCKS_AVAILABLE
   void (^block)(NSData *, NSError *);
+#else
+  id block = nil;
 #endif
 
   // If -stopFetching is called in another thread directly after this @synchronized stanza finishes
@@ -970,7 +1062,18 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
     block = [[completionBlock_ retain] autorelease];
 #endif
   }
+  [self invokeFetchCallbacksWithTarget:target
+                              selector:sel
+                                 block:block
+                                  data:data
+                                 error:error];
+}
 
+- (void)invokeFetchCallbacksWithTarget:(id)target
+                              selector:(SEL)sel
+                                 block:(id)block
+                                  data:(NSData *)data
+                                 error:(NSError *)error {
   [[self retain] autorelease];  // In case the callback releases us
 
   [self invokeFetchCallback:sel
@@ -980,7 +1083,7 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
 
 #if NS_BLOCKS_AVAILABLE
   if (block) {
-    block(data, error);
+    ((void (^)(NSData *, NSError *))block)(data, error);
   }
 #endif
 }
@@ -1016,6 +1119,23 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
   NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:2];
   [dict setValue:data forKey:kCallbackData];
   [dict setValue:error forKey:kCallbackError];
+
+  // If -stopFetching is called in another thread directly after this @synchronized stanza finishes
+  // on this thread, then target and block could be released before being used in this method. So
+  // retain each until this method is done with them.
+  @synchronized(self) {
+    id target = delegate_;
+    NSString *sel = finishedSel_ ? NSStringFromSelector(finishedSel_) : nil;
+#if NS_BLOCKS_AVAILABLE
+    void (^block)(NSData *, NSError *) = completionBlock_;
+#else
+    id block = nil;
+#endif
+    [dict setValue:target forKey:kCallbackTarget];
+    [dict setValue:sel forKey:kCallbackSelector];
+    [dict setValue:block forKey:kCallbackBlock];
+  }
+
   NSInvocationOperation *op =
     [[[NSInvocationOperation alloc] initWithTarget:self
                                           selector:@selector(invokeOnQueueWithDictionary:)
@@ -1024,12 +1144,20 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
 }
 
 - (void)invokeOnQueueWithDictionary:(NSDictionary *)dict {
+  id target = [dict objectForKey:kCallbackTarget];
+  NSString *selStr = [dict objectForKey:kCallbackSelector];
+  SEL sel = selStr ? NSSelectorFromString(selStr) : NULL;
+  id block = [dict objectForKey:kCallbackBlock];
+
   NSData *data = [dict objectForKey:kCallbackData];
   NSError *error = [dict objectForKey:kCallbackError];
 
-  [self invokeFetchCallbacksWithData:data error:error];
+  [self invokeFetchCallbacksWithTarget:target
+                              selector:sel
+                                 block:block
+                                  data:data
+                                 error:error];
 }
-
 
 - (void)invokeSentDataCallback:(SEL)sel
                         target:(id)target
@@ -1410,6 +1538,21 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
   BOOL shouldDoIntervalRetry = [self isRetryEnabled]
     && ([self nextRetryInterval] < [self maxRetryInterval]);
 
+  if (shouldDoIntervalRetry) {
+    // If an explicit max retry interval was set, we expect repeated backoffs to take
+    // up to roughly twice that for repeated fast failures.  If the initial attempt is
+    // already more than 3 times the max retry interval, then failures have taken a long time
+    // (such as from network timeouts) so don't retry again to avoid the app becoming
+    // unexpectedly unresponsive.
+    if (maxRetryInterval_ > kUnsetMaxRetryInterval) {
+      NSTimeInterval maxAllowedIntervalBeforeRetry = maxRetryInterval_ * 3;
+      NSTimeInterval timeSinceInitialRequest = -[initialRequestDate_ timeIntervalSinceNow];
+      if (timeSinceInitialRequest > maxAllowedIntervalBeforeRetry) {
+        shouldDoIntervalRetry = NO;
+      }
+    }
+  }
+
   BOOL willRetry = NO;
   BOOL canRetry = shouldRetryForAuthRefresh || shouldDoIntervalRetry;
   if (canRetry) {
@@ -1594,6 +1737,8 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
          properties;
 
 @synthesize mutableRequest = request_,
+            allowedInsecureSchemes = allowedInsecureSchemes_,
+            allowLocalhostRequest = allowLocalhostRequest_,
             credential = credential_,
             proxyCredential = proxyCredential_,
             postData = postData_,
@@ -1705,7 +1850,7 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
 
 - (id)userData {
   @synchronized(self) {
-    return userData_;
+    return [[userData_ retain] autorelease];
   }
 }
 
@@ -1728,7 +1873,7 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
 
 - (NSMutableDictionary *)properties {
   @synchronized(self) {
-    return properties_;
+    return [[properties_ retain] autorelease];
   }
 }
 
@@ -1743,7 +1888,7 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
 
 - (id)propertyForKey:(NSString *)key {
   @synchronized(self) {
-    return [properties_ objectForKey:key];
+    return [[[properties_ objectForKey:key] retain] autorelease];
   }
 }
 
@@ -1755,6 +1900,14 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
       [properties_ addEntriesFromDictionary:dict];
     }
   }
+}
+
+- (NSData *)bodyData {
+  return self.postData;
+}
+
+- (void)setBodyData:(NSData *)postData {
+  self.postData = postData;
 }
 
 - (void)setCommentWithFormat:(id)format, ... {
@@ -1848,8 +2001,12 @@ NSString *GTMCleanedUserAgentString(NSString *str) {
 
   NSMutableString *result = [NSMutableString stringWithString:str];
 
-  // Replace spaces with underscores
+  // Replace spaces and commas with underscores
   [result replaceOccurrencesOfString:@" "
+                          withString:@"_"
+                             options:0
+                               range:NSMakeRange(0, [result length])];
+  [result replaceOccurrencesOfString:@","
                           withString:@"_"
                              options:0
                                range:NSMakeRange(0, [result length])];
@@ -1858,7 +2015,7 @@ NSString *GTMCleanedUserAgentString(NSString *str) {
   static NSCharacterSet *charsToDelete = nil;
   if (charsToDelete == nil) {
     // Make a set of unwanted characters
-    NSString *const kSeparators = @"()<>@,;:\\\"/[]?={}";
+    NSString *const kSeparators = @"()<>@;:\\\"/[]?={}";
 
     NSMutableCharacterSet *mutableChars;
     mutableChars = [[[NSCharacterSet whitespaceAndNewlineCharacterSet] mutableCopy] autorelease];
@@ -1902,13 +2059,26 @@ NSString *GTMSystemVersionString(void) {
     // Avoid the slowness of calling currentDevice repeatedly on the iPhone
     UIDevice* currentDevice = [UIDevice currentDevice];
 
-    NSString *rawModel = [currentDevice model];
-    NSString *model = GTMCleanedUserAgentString(rawModel);
-
+    NSString *model = [currentDevice model];
+    NSString *cleanedModel = GTMCleanedUserAgentString(model);
     NSString *systemVersion = [currentDevice systemVersion];
 
-    savedSystemString = [[NSString alloc] initWithFormat:@"%@/%@",
-                         model, systemVersion]; // "iPod_Touch/2.2"
+#if TARGET_IPHONE_SIMULATOR
+    NSString *hardwareModel = @"sim";
+#else
+    NSString *hardwareModel;
+    struct utsname unameRecord;
+    if (uname(&unameRecord) == 0) {
+      NSString *machineName = [NSString stringWithCString:unameRecord.machine
+                                                 encoding:NSUTF8StringEncoding];
+      hardwareModel = GTMCleanedUserAgentString(machineName);
+    } else {
+      hardwareModel = @"unk";
+    }
+#endif
+    savedSystemString = [[NSString alloc] initWithFormat:@"%@/%@ hw/%@",
+                         cleanedModel, systemVersion, hardwareModel];
+    // Example:  iPod_Touch/2.2 hw/iPod1_1
   }
   systemString = savedSystemString;
 
@@ -1931,43 +2101,56 @@ NSString *GTMSystemVersionString(void) {
 // Return a generic name and version for the current application; this avoids
 // anonymous server transactions.
 NSString *GTMApplicationIdentifier(NSBundle *bundle) {
-  static NSString *sAppID = nil;
-  if (sAppID != nil) return sAppID;
+  @synchronized([GTMHTTPFetcher class]) {
+    static NSMutableDictionary *sAppIDMap = nil;
 
-  // If there's a bundle ID, use that; otherwise, use the process name
-  if (bundle == nil) {
-    bundle = [NSBundle mainBundle];
+    // If there's a bundle ID, use that; otherwise, use the process name
+    if (bundle == nil) {
+      bundle = [NSBundle mainBundle];
+    }
+    NSString *bundleID = [bundle bundleIdentifier];
+    if (bundleID == nil) {
+      bundleID = @"";
+    }
+
+    NSString *identifier = [sAppIDMap objectForKey:bundleID];
+    if (identifier) return identifier;
+
+    // Apps may add a string to the info.plist to uniquely identify different builds.
+    identifier = [bundle objectForInfoDictionaryKey:@"GTMUserAgentID"];
+    if ([identifier length] == 0) {
+      if ([bundleID length] > 0) {
+        identifier = bundleID;
+      } else {
+        // Fall back on the procname, prefixed by "proc" to flag that it's
+        // autogenerated and perhaps unreliable
+        NSString *procName = [[NSProcessInfo processInfo] processName];
+        identifier = [NSString stringWithFormat:@"proc_%@", procName];
+      }
+    }
+
+    // Clean up whitespace and special characters
+    identifier = GTMCleanedUserAgentString(identifier);
+
+    // If there's a version number, append that
+    NSString *version = [bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    if ([version length] == 0) {
+      version = [bundle objectForInfoDictionaryKey:@"CFBundleVersion"];
+    }
+
+    // Clean up whitespace and special characters
+    version = GTMCleanedUserAgentString(version);
+
+    // Glue the two together (cleanup done above or else cleanup would strip the
+    // slash)
+    if ([version length] > 0) {
+      identifier = [identifier stringByAppendingFormat:@"/%@", version];
+    }
+
+    if (sAppIDMap == nil) {
+      sAppIDMap = [[NSMutableDictionary alloc] init];
+    }
+    [sAppIDMap setObject:identifier forKey:bundleID];
+    return identifier;
   }
-
-  NSString *identifier;
-  NSString *bundleID = [bundle bundleIdentifier];
-  if ([bundleID length] > 0) {
-    identifier = bundleID;
-  } else {
-    // Fall back on the procname, prefixed by "proc" to flag that it's
-    // autogenerated and perhaps unreliable
-    NSString *procName = [[NSProcessInfo processInfo] processName];
-    identifier = [NSString stringWithFormat:@"proc_%@", procName];
-  }
-
-  // Clean up whitespace and special characters
-  identifier = GTMCleanedUserAgentString(identifier);
-
-  // If there's a version number, append that
-  NSString *version = [bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-  if ([version length] == 0) {
-    version = [bundle objectForInfoDictionaryKey:@"CFBundleVersion"];
-  }
-
-  // Clean up whitespace and special characters
-  version = GTMCleanedUserAgentString(version);
-
-  // Glue the two together (cleanup done above or else cleanup would strip the
-  // slash)
-  if ([version length] > 0) {
-    identifier = [identifier stringByAppendingFormat:@"/%@", version];
-  }
-
-  sAppID = [identifier copy];
-  return sAppID;
 }

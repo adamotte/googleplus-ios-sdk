@@ -14,6 +14,7 @@
 		00F70E99158007D90077799E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00F70E98158007D90077799E /* Security.framework */; };
 		00F70E9B158008040077799E /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00F70E9A158008040077799E /* SystemConfiguration.framework */; };
 		0C52D6F8158BAB1F001510E6 /* button_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 0C52D6F7158BAB1F001510E6 /* button_background.png */; };
+		0CFD5361182804FA00192CCB /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CFD5360182804FA00192CCB /* QuartzCore.framework */; };
 		2A08FF9817B0360B0071C0C8 /* ShareConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A08FF9717B0360B0071C0C8 /* ShareConfiguration.m */; };
 		2A08FF9B17B036AD0071C0C8 /* ShareActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A08FF9A17B036AD0071C0C8 /* ShareActivity.m */; };
 		2A18CC8917A1C60E00FF6AD4 /* MomentDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A18CC8717A1C60E00FF6AD4 /* MomentDetailViewController.m */; };
@@ -77,10 +78,11 @@
 		D9EE74CA158A8E0500EC1D05 /* SignInViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D9EE74C0158A8E0500EC1D05 /* SignInViewController.xib */; };
 		D9EE74CD158A8E2900EC1D05 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D9EE74CB158A8E2900EC1D05 /* InfoPlist.strings */; };
 		E0681E5F171F46EB0098D356 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E0681E5E171F46EB0098D356 /* Default-568h@2x.png */; };
+		E0F429A3182089DB00EC8A9E /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0F429A2182089DB00EC8A9E /* AddressBook.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0043C79A1580045B000DF02E /* GooglePlusSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GooglePlusSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0043C79A1580045B000DF02E /* GooglePlusPlatformSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GooglePlusPlatformSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0043C79E1580045B000DF02E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		0043C7A01580045B000DF02E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		0043C7A21580045B000DF02E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -88,6 +90,7 @@
 		00F70E98158007D90077799E /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		00F70E9A158008040077799E /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		0C52D6F7158BAB1F001510E6 /* button_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = button_background.png; path = Resources/button_background.png; sourceTree = SOURCE_ROOT; };
+		0CFD5360182804FA00192CCB /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		2A08FF9617B0360B0071C0C8 /* ShareConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShareConfiguration.h; sourceTree = SOURCE_ROOT; };
 		2A08FF9717B0360B0071C0C8 /* ShareConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShareConfiguration.m; sourceTree = SOURCE_ROOT; };
 		2A08FF9917B036AD0071C0C8 /* ShareActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShareActivity.h; sourceTree = SOURCE_ROOT; };
@@ -151,6 +154,41 @@
 		8E6D7D1517BA9DFF00FF96DE /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		8E6D7D1717BA9E0700FF96DE /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		D907F675166967D400EB5273 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "Resources/Icon@2x.png"; sourceTree = SOURCE_ROOT; };
+		D91A24561811B51D0042A795 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24581811B5300042A795 /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24591811B53A0042A795 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A245A1811B5440042A795 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A245B1811B55C0042A795 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A245C1811B56C0042A795 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A245D1811B57A0042A795 /* en_AU */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en_AU; path = en_AU.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A245E1811B5840042A795 /* en_GB */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en_GB; path = en_GB.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A245F1811B5920042A795 /* es_MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es_MX; path = es_MX.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24601811B5A40042A795 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24611811B5B20042A795 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24621811B5C30042A795 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24631811B5CE0042A795 /* hr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hr; path = hr.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24641811B5DB0042A795 /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24651811B5EE0042A795 /* id */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = id; path = id.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24661811B5FA0042A795 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24671811B6120042A795 /* iw */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = iw; path = iw.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24681811B6200042A795 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24691811B6360042A795 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A246A1811CBFF0042A795 /* ms */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ms; path = ms.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A246B1811CC0A0042A795 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A246C1811CC170042A795 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A246D1811CC240042A795 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A246E1811CC330042A795 /* pt_PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt_PT; path = pt_PT.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A246F1811CC400042A795 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24701811CC530042A795 /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24711811CC6C0042A795 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24721811CC780042A795 /* sk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sk; path = sk.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24731811CC890042A795 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24741811CC970042A795 /* th */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = th; path = th.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24751811CCA10042A795 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24761811CCAA0042A795 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24771811CCB40042A795 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24781811CCBC0042A795 /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_CN; path = zh_CN.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		D91A24791811CCC50042A795 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
 		D92939E217A04DA00024AA91 /* AuthInspectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AuthInspectorViewController.h; sourceTree = SOURCE_ROOT; };
 		D92939E317A04DA00024AA91 /* AuthInspectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AuthInspectorViewController.m; sourceTree = SOURCE_ROOT; };
 		D945ED36166AE4950051858C /* ListPeopleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListPeopleViewController.h; sourceTree = SOURCE_ROOT; };
@@ -181,6 +219,7 @@
 		D9EE74C0158A8E0500EC1D05 /* SignInViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SignInViewController.xib; sourceTree = SOURCE_ROOT; };
 		D9EE74CC158A8E2900EC1D05 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
 		E0681E5E171F46EB0098D356 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "Resources/Default-568h@2x.png"; sourceTree = SOURCE_ROOT; };
+		E0F429A2182089DB00EC8A9E /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,10 +229,12 @@
 			files = (
 				8E47E996171CB75C003FBA75 /* GooglePlus.framework in Frameworks */,
 				8E47E994171CB75C003FBA75 /* GoogleOpenSource.framework in Frameworks */,
+				E0F429A3182089DB00EC8A9E /* AddressBook.framework in Frameworks */,
 				8E6D7D1417BA9DFA00FF96DE /* AssetsLibrary.framework in Frameworks */,
 				8E6D7D1617BA9DFF00FF96DE /* CoreLocation.framework in Frameworks */,
 				D997D0F1174ED53B00AE561F /* CoreText.framework in Frameworks */,
 				2A60BD2417D142FE0091A09C /* CoreMotion.framework in Frameworks */,
+				0CFD5361182804FA00192CCB /* QuartzCore.framework in Frameworks */,
 				8E6D7D1817BA9E0700FF96DE /* MediaPlayer.framework in Frameworks */,
 				D973B402158ABC1F0083A4B5 /* MessageUI.framework in Frameworks */,
 				2A60BD2017D128960091A09C /* MobileCoreServices.framework in Frameworks */,
@@ -220,7 +261,7 @@
 		0043C79B1580045B000DF02E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0043C79A1580045B000DF02E /* GooglePlusSample.app */,
+				0043C79A1580045B000DF02E /* GooglePlusPlatformSample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -228,7 +269,8 @@
 		0043C79D1580045B000DF02E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D9EE74BD158A8E0500EC1D05 /* ShareViewController.xib */,
+				0CFD5360182804FA00192CCB /* QuartzCore.framework */,
+				E0F429A2182089DB00EC8A9E /* AddressBook.framework */,
 				8E47E993171CB75C003FBA75 /* GooglePlus.framework */,
 				8E47E992171CB75C003FBA75 /* GooglePlus.bundle */,
 				8E47E991171CB75C003FBA75 /* GoogleOpenSource.framework */,
@@ -291,6 +333,7 @@
 				2AAF84FD178F3ED800822BAE /* ShareConfigurationOptions.plist */,
 				D9EE74BB158A8E0500EC1D05 /* ShareViewController.h */,
 				D9EE74BC158A8E0500EC1D05 /* ShareViewController.m */,
+				D9EE74BD158A8E0500EC1D05 /* ShareViewController.xib */,
 				D9EE74BE158A8E0500EC1D05 /* SignInViewController.h */,
 				D9EE74BF158A8E0500EC1D05 /* SignInViewController.m */,
 				D9EE74C0158A8E0500EC1D05 /* SignInViewController.xib */,
@@ -380,7 +423,7 @@
 			);
 			name = GooglePlusSample;
 			productName = GooglePlusSample;
-			productReference = 0043C79A1580045B000DF02E /* GooglePlusSample.app */;
+			productReference = 0043C79A1580045B000DF02E /* GooglePlusPlatformSample.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -389,7 +432,7 @@
 		0043C7911580045B000DF02E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Google Inc";
 			};
 			buildConfigurationList = 0043C7941580045B000DF02E /* Build configuration list for PBXProject "GooglePlusSample" */;
@@ -482,6 +525,7 @@
 				zh_TW,
 				zh,
 				zu,
+				en_AU,
 			);
 			mainGroup = 0043C78F1580045B000DF02E;
 			productRefGroup = 0043C79B1580045B000DF02E /* Products */;
@@ -574,6 +618,41 @@
 			isa = PBXVariantGroup;
 			children = (
 				D9EE74CC158A8E2900EC1D05 /* en */,
+				D91A24561811B51D0042A795 /* ar */,
+				D91A24581811B5300042A795 /* ca */,
+				D91A24591811B53A0042A795 /* cs */,
+				D91A245A1811B5440042A795 /* da */,
+				D91A245B1811B55C0042A795 /* de */,
+				D91A245C1811B56C0042A795 /* el */,
+				D91A245D1811B57A0042A795 /* en_AU */,
+				D91A245E1811B5840042A795 /* en_GB */,
+				D91A245F1811B5920042A795 /* es_MX */,
+				D91A24601811B5A40042A795 /* es */,
+				D91A24611811B5B20042A795 /* fi */,
+				D91A24621811B5C30042A795 /* fr */,
+				D91A24631811B5CE0042A795 /* hr */,
+				D91A24641811B5DB0042A795 /* hu */,
+				D91A24651811B5EE0042A795 /* id */,
+				D91A24661811B5FA0042A795 /* it */,
+				D91A24671811B6120042A795 /* iw */,
+				D91A24681811B6200042A795 /* ja */,
+				D91A24691811B6360042A795 /* ko */,
+				D91A246A1811CBFF0042A795 /* ms */,
+				D91A246B1811CC0A0042A795 /* nb */,
+				D91A246C1811CC170042A795 /* nl */,
+				D91A246D1811CC240042A795 /* pl */,
+				D91A246E1811CC330042A795 /* pt_PT */,
+				D91A246F1811CC400042A795 /* pt */,
+				D91A24701811CC530042A795 /* ro */,
+				D91A24711811CC6C0042A795 /* ru */,
+				D91A24721811CC780042A795 /* sk */,
+				D91A24731811CC890042A795 /* sv */,
+				D91A24741811CC970042A795 /* th */,
+				D91A24751811CCA10042A795 /* tr */,
+				D91A24761811CCAA0042A795 /* uk */,
+				D91A24771811CCB40042A795 /* vi */,
+				D91A24781811CCBC0042A795 /* zh_CN */,
+				D91A24791811CCC50042A795 /* zh_TW */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -585,8 +664,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -601,11 +681,15 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -616,8 +700,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -625,11 +710,14 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
@@ -654,7 +742,7 @@
 					"\"$(SRCROOT)\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = GooglePlusPlatformSample;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -675,7 +763,7 @@
 					"\"$(SRCROOT)\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = GooglePlusPlatformSample;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

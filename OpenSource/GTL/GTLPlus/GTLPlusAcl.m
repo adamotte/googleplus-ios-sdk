@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Google Inc.
+/* Copyright (c) 2014 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 // Documentation:
 //   https://developers.google.com/+/api/
 // Classes:
-//   GTLPlusAcl (0 custom class methods, 4 custom properties)
+//   GTLPlusAcl (0 custom class methods, 3 custom properties)
 
 #import "GTLPlusAcl.h"
 
@@ -38,7 +38,7 @@
 //
 
 @implementation GTLPlusAcl
-@dynamic descriptionProperty, domainRestricted, items, kind;
+@dynamic descriptionProperty, items, kind;
 
 + (NSDictionary *)propertyToJSONKeyMap {
   NSDictionary *map =

@@ -34,35 +34,38 @@ typedef void(^AlertViewActionBlock)(void);
 
 @end
 
-static NSString * const kPlaceholderUserName = @"<Name>";
-static NSString * const kPlaceholderEmailAddress = @"<Email>";
-static NSString * const kPlaceholderAvatarImageName = @"PlaceholderAvatar.png";
+static NSString *const kPlaceholderUserName = @"<Name>";
+static NSString *const kPlaceholderEmailAddress = @"<Email>";
+static NSString *const kPlaceholderAvatarImageName = @"PlaceholderAvatar.png";
 
-// Labels for the cells that have in-cell control elements
-static NSString * const kGetUserIDCellLabel = @"Get user ID";
-static NSString * const kSingleSignOnCellLabel = @"Use Single Sign-On";
-static NSString * const kButtonWidthCellLabel = @"Width";
+// Labels for the cells that have in-cell control elements.
+static NSString *const kGetUserIDCellLabel = @"Get user ID";
+static NSString *const kSingleSignOnCellLabel = @"Use Single Sign-On";
+static NSString *const kButtonWidthCellLabel = @"Width";
 
-// Labels for the cells that drill down to data pickers
-static NSString * const kColorSchemeCellLabel = @"Color scheme";
-static NSString * const kStyleCellLabel = @"Style";
-static NSString * const kAppActivitiesCellLabel = @"App activity types";
+// Labels for the cells that drill down to data pickers.
+static NSString *const kColorSchemeCellLabel = @"Color scheme";
+static NSString *const kStyleCellLabel = @"Style";
+static NSString *const kAppActivitiesCellLabel = @"App activity types";
 
-// Strings for Alert Views
-static NSString * const kSignOutAlertViewTitle = @"Warning";
-static NSString * const kSignOutAlertViewMessage =
+// Strings for Alert Views.
+static NSString *const kSignOutAlertViewTitle = @"Warning";
+static NSString *const kSignOutAlertViewMessage =
     @"Modifying this element will sign you out of G+. Are you sure you wish to continue?";
-static NSString * const kSignOutAlertCancelTitle = @"Cancel";
-static NSString * const kSignOutAlertConfirmTitle = @"Continue";
+static NSString *const kSignOutAlertCancelTitle = @"Cancel";
+static NSString *const kSignOutAlertConfirmTitle = @"Continue";
+
+// Accessibility Identifiers.
+static NSString *const kCredentialsButtonAccessibilityIdentifier = @"Credentials";
 
 @implementation SignInViewController {
   // This is an array of arrays, each one corresponding to the cell
-  // labels for its respective section
+  // labels for its respective section.
   NSArray *_sectionCellLabels;
 
   // These sets contain the labels corresponding to cells that have various
   // types (each cell either drills down to another table view, contains an
-  // in-cell switch, or contains a slider)
+  // in-cell switch, or contains a slider).
   NSArray *_drillDownCells;
   NSArray *_switchCells;
   NSArray *_sliderCells;
@@ -84,7 +87,7 @@ static NSString * const kSignOutAlertConfirmTitle = @"Continue";
     @[ kAppActivitiesCellLabel, kGetUserIDCellLabel, kSingleSignOnCellLabel ]
   ];
 
-  // Groupings of cell types
+  // Groupings of cell types.
   _drillDownCells = @[
     kColorSchemeCellLabel,
     kStyleCellLabel,
@@ -94,7 +97,7 @@ static NSString * const kSignOutAlertConfirmTitle = @"Continue";
   _switchCells = @[ kGetUserIDCellLabel, kSingleSignOnCellLabel ];
   _sliderCells = @[ kButtonWidthCellLabel ];
 
-  // Initialize data picker states:
+  // Initialize data picker states.
   NSString *dictionaryPath =
       [[NSBundle mainBundle] pathForResource:@"DataPickerDictionary"
                                       ofType:@"plist"];
@@ -158,6 +161,12 @@ static NSString * const kSignOutAlertConfirmTitle = @"Continue";
   return self;
 }
 
+- (void)viewDidLoad {
+  [super viewDidLoad];
+
+  self.credentialsButton.accessibilityIdentifier = kCredentialsButtonAccessibilityIdentifier;
+}
+
 - (void)viewWillAppear:(BOOL)animated {
   [self adoptUserSettings];
   [[GPPSignIn sharedInstance] trySilentAuthentication];
@@ -191,6 +200,10 @@ static NSString * const kSignOutAlertConfirmTitle = @"Continue";
   }
   [self refreshUserInfo];
   [self updateButtons];
+}
+
+- (void)presentSignInViewController:(UIViewController *)viewController {
+  [[self navigationController] pushViewController:viewController animated:YES];
 }
 
 #pragma mark - Helper methods
@@ -461,6 +474,8 @@ static NSString * const kSignOutAlertConfirmTitle = @"Continue";
     cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1
                                   reuseIdentifier:identifier];
   }
+  // Assign accessibility labels to each cell row.
+  cell.accessibilityLabel = label;
 
   if (identifier == kDrilldownCell) {
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -470,6 +485,7 @@ static NSString * const kSignOutAlertConfirmTitle = @"Continue";
     } else {
       cell.detailTextLabel.text = [dataState.selectedCells anyObject];
     }
+    cell.accessibilityValue = cell.detailTextLabel.text;
   } else if (identifier == kSwitchCell) {
     UISwitch *toggle = [[UISwitch alloc] initWithFrame:CGRectZero];
 
@@ -484,6 +500,7 @@ static NSString * const kSignOutAlertConfirmTitle = @"Continue";
           forControlEvents:UIControlEventValueChanged];
       toggle.on = [GPPSignIn sharedInstance].attemptSSO;
     }
+    toggle.accessibilityLabel = [NSString stringWithFormat:@"%@ Switch", cell.accessibilityLabel];
     cell.accessoryView = toggle;
   } else if (identifier == kSliderCell) {
     UISlider *slider =
@@ -497,6 +514,7 @@ static NSString * const kSignOutAlertConfirmTitle = @"Continue";
                action:@selector(changeSignInButtonWidth:)
         forControlEvents:UIControlEventValueChanged];
     cell.accessoryView = slider;
+    slider.accessibilityIdentifier = [NSString stringWithFormat:@"%@ Slider", label];
     self.signInButtonWidthSlider = slider;
   }
 
@@ -520,6 +538,14 @@ static NSString * const kSignOutAlertConfirmTitle = @"Continue";
                                                  bundle:nil
                                               dataState:dataState];
   dataPicker.navigationItem.title = label;
+
+  // Force the back button title to be 'Back'
+  UIBarButtonItem *newBackButton =
+      [[UIBarButtonItem alloc] initWithTitle:@"Back"
+                                       style:UIBarButtonItemStyleBordered
+                                      target:nil
+                                      action:nil];
+  [[self navigationItem] setBackBarButtonItem:newBackButton];
 
   if ([[GPPSignIn sharedInstance] authentication] &&
       [label isEqualToString:kAppActivitiesCellLabel]) {

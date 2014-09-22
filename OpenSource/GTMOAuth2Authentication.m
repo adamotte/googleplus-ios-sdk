@@ -65,14 +65,9 @@ NSString *const kGTMOAuth2WebViewCancelled      = @"cancelled";
 NSString *const kGTMOAuth2NetworkLost         = @"kGTMOAuthNetworkLost";
 NSString *const kGTMOAuth2NetworkFound        = @"kGTMOAuthNetworkFound";
 
-
 // standard OAuth keys
 static NSString *const kOAuth2AccessTokenKey   = @"access_token";
 static NSString *const kOAuth2RefreshTokenKey  = @"refresh_token";
-static NSString *const kOAuth2ClientIDKey      = @"client_id";
-static NSString *const kOAuth2ClientSecretKey  = @"client_secret";
-static NSString *const kOAuth2RedirectURIKey   = @"redirect_uri";
-static NSString *const kOAuth2ResponseTypeKey  = @"response_type";
 static NSString *const kOAuth2ScopeKey         = @"scope";
 static NSString *const kOAuth2ErrorKey         = @"error";
 static NSString *const kOAuth2TokenTypeKey     = @"token_type";
@@ -90,8 +85,6 @@ static NSString *const kUserEmailIsVerifiedKey = @"isVerified";
 // fetcher keys
 static NSString *const kTokenFetchDelegateKey = @"delegate";
 static NSString *const kTokenFetchSelectorKey = @"sel";
-
-static NSString *const kRefreshFetchArgsKey = @"requestArgs";
 
 // If GTMNSJSONSerialization is available, it is used for formatting JSON
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE && (MAC_OS_X_VERSION_MAX_ALLOWED < 1070)) || \
@@ -182,12 +175,12 @@ static NSString *const kRefreshFetchArgsKey = @"requestArgs";
 
 - (void)updateExpirationDate;
 
-- (void)tokenFetcher:(GTMHTTPFetcher *)fetcher
+- (void)tokenFetcher:(GTMOAuth2Fetcher *)fetcher
     finishedWithData:(NSData *)data
                error:(NSError *)error;
 
 - (void)auth:(GTMOAuth2Authentication *)auth
-finishedRefreshWithFetcher:(GTMHTTPFetcher *)fetcher
+finishedRefreshWithFetcher:(GTMOAuth2Fetcher *)fetcher
        error:(NSError *)error;
 
 - (void)invokeCallbackArgs:(GTMOAuth2AuthorizationArgs *)args;
@@ -421,10 +414,10 @@ finishedRefreshWithFetcher:(GTMHTTPFetcher *)fetcher
 - (void)authorizeRequest:(NSMutableURLRequest *)request
                 delegate:(id)delegate
        didFinishSelector:(SEL)sel {
-  GTMAssertSelectorNilOrImplementedWithArgs(delegate, sel,
-                                            @encode(GTMOAuth2Authentication *),
-                                            @encode(NSMutableURLRequest *),
-                                            @encode(NSError *), 0);
+  GTMOAuth2AssertValidSelector(delegate, sel,
+                               @encode(GTMOAuth2Authentication *),
+                               @encode(NSMutableURLRequest *),
+                               @encode(NSError *), 0);
 
   GTMOAuth2AuthorizationArgs *args;
   args = [GTMOAuth2AuthorizationArgs argsWithRequest:request
@@ -472,7 +465,7 @@ finishedRefreshWithFetcher:(GTMHTTPFetcher *)fetcher
 }
 
 - (void)auth:(GTMOAuth2Authentication *)auth
-finishedRefreshWithFetcher:(GTMHTTPFetcher *)fetcher
+finishedRefreshWithFetcher:(GTMOAuth2Fetcher *)fetcher
        error:(NSError *)error {
   @synchronized(authorizationQueue_) {
     // If there's an error, we want to try using the old access token anyway,
@@ -501,7 +494,7 @@ finishedRefreshWithFetcher:(GTMHTTPFetcher *)fetcher
       // JSON error key's value for easy inspection by the observer.
       noteName = kGTMOAuth2AccessTokenRefreshFailed;
       NSString *jsonErr = nil;
-      if ([error code] == kGTMHTTPFetcherStatusBadRequest) {
+      if ([error code] == kGTMOAuth2StatusBadRequest) {
         NSDictionary *json = [[error userInfo] objectForKey:kGTMOAuth2ErrorJSONKey];
         jsonErr = [json objectForKey:kGTMOAuth2ErrorMessageKey];
       }
@@ -581,9 +574,11 @@ finishedRefreshWithFetcher:(GTMHTTPFetcher *)fetcher
 
   NSMutableURLRequest *request = args.request;
 
-  NSString *scheme = [[request URL] scheme];
+  NSURL *requestURL = [request URL];
+  NSString *scheme = [requestURL scheme];
   BOOL isAuthorizableRequest = self.shouldAuthorizeAllRequests
-    || [scheme caseInsensitiveCompare:@"https"] == NSOrderedSame;
+    || [scheme caseInsensitiveCompare:@"https"] == NSOrderedSame
+    || [requestURL isFileURL];
   if (!isAuthorizableRequest) {
     // Request is not https, so may be insecure
     //
@@ -735,7 +730,7 @@ finishedRefreshWithFetcher:(GTMHTTPFetcher *)fetcher
   // If there is a refresh fetcher pending, wait for it.
   //
   // This is only intended for unit test or for use in command-line tools.
-  GTMHTTPFetcher *fetcher = self.refreshFetcher;
+  GTMOAuth2Fetcher *fetcher = self.refreshFetcher;
   [fetcher waitForCompletionWithTimeout:timeoutInSeconds];
 }
 
@@ -761,7 +756,7 @@ finishedRefreshWithFetcher:(GTMHTTPFetcher *)fetcher
   return userAgent;
 }
 
-- (GTMHTTPFetcher *)beginTokenFetchWithDelegate:(id)delegate
+- (GTMOAuth2Fetcher *)beginTokenFetchWithDelegate:(id)delegate
                               didFinishSelector:(SEL)finishedSel {
 
   NSMutableDictionary *paramsDict = [NSMutableDictionary dictionary];
@@ -845,20 +840,25 @@ finishedRefreshWithFetcher:(GTMHTTPFetcher *)fetcher
   NSString *userAgent = [self userAgent];
   [request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
 
-  GTMHTTPFetcher *fetcher;
-  id <GTMHTTPFetcherServiceProtocol> fetcherService = self.fetcherService;
+  GTMOAuth2Fetcher *fetcher;
+  id <GTMOAuth2FetcherServiceProtocol> fetcherService = self.fetcherService;
   if (fetcherService) {
-    fetcher = [fetcherService fetcherWithRequest:request];
+    fetcher = (GTMOAuth2Fetcher *)[fetcherService fetcherWithRequest:request];
 
     // Don't use an authorizer for an auth token fetch
     fetcher.authorizer = nil;
   } else {
-    fetcher = [GTMHTTPFetcher fetcherWithRequest:request];
+    fetcher = [GTMOAuth2Fetcher fetcherWithRequest:request];
   }
 
-  NSString *const template = (refreshToken ? @"refresh token for %@ %@" : @"fetch tokens for %@ %@");
-  [fetcher setCommentWithFormat:template, [tokenURL host], [self userEmail]];
-  fetcher.postData = paramData;
+#if !STRIP_GTM_FETCH_LOGGING
+  // The user email address is known at token refresh time, not during the initial code exchange.
+  NSString *userEmail = [self userEmail];
+  NSString *forStr = userEmail ? [NSString stringWithFormat:@"for \"%@\"", userEmail] : @"";
+  [fetcher setCommentWithFormat:@"GTMOAuth2 %@ fetch to %@ %@", fetchType, [tokenURL host], forStr];
+#endif
+
+  fetcher.bodyData = paramData;
   fetcher.retryEnabled = YES;
   fetcher.maxRetryInterval = 15.0;
 
@@ -869,26 +869,14 @@ finishedRefreshWithFetcher:(GTMHTTPFetcher *)fetcher
     [fetcher setProperty:selStr forKey:kTokenFetchSelectorKey];
   }
 
-  if ([fetcher beginFetchWithDelegate:self
-                    didFinishSelector:@selector(tokenFetcher:finishedWithData:error:)]) {
-    // Fetch began
-    [self notifyFetchIsRunning:YES fetcher:fetcher type:fetchType];
-    return fetcher;
-  } else {
-    // Failed to start fetching; typically a URL issue
-    NSError *error = [NSError errorWithDomain:kGTMHTTPFetcherStatusDomain
-                                         code:-1
-                                     userInfo:nil];
-    [[self class] invokeDelegate:delegate
-                        selector:finishedSel
-                          object:self
-                          object:nil
-                          object:error];
-    return nil;
-  }
+  [fetcher beginFetchWithDelegate:self
+                didFinishSelector:@selector(tokenFetcher:finishedWithData:error:)];
+
+  [self notifyFetchIsRunning:YES fetcher:fetcher type:fetchType];
+  return fetcher;
 }
 
-- (void)tokenFetcher:(GTMHTTPFetcher *)fetcher
+- (void)tokenFetcher:(GTMOAuth2Fetcher *)fetcher
     finishedWithData:(NSData *)data
                error:(NSError *)error {
   [self notifyFetchIsRunning:NO fetcher:fetcher type:nil];
@@ -967,7 +955,7 @@ finishedRefreshWithFetcher:(GTMHTTPFetcher *)fetcher
 #pragma mark Fetch Notifications
 
 - (void)notifyFetchIsRunning:(BOOL)isStarting
-                     fetcher:(GTMHTTPFetcher *)fetcher
+                     fetcher:(GTMOAuth2Fetcher *)fetcher
                         type:(NSString *)fetchType {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
 

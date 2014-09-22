@@ -1,3 +1,7 @@
+#if !defined(__has_feature) || !__has_feature(objc_arc)
+#error "This file requires ARC support."
+#endif
+
 // Copyright 2012, Google Inc.
 // All rights reserved.
 //
@@ -55,13 +59,13 @@ static NSString * const kVersionKey = @"Version-1";
 
 static NSString * encodeByAddingPercentEscapes(NSString *input) {
   NSString *encodedValue =
-      (NSString *)CFURLCreateStringByAddingPercentEscapes(
+      (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(
           kCFAllocatorDefault,
           (CFStringRef)input,
           NULL,
           (CFStringRef)@"!*'();:@&=+$,/?%#[]",
-          kCFStringEncodingUTF8);
-  return [encodedValue autorelease];
+          kCFStringEncodingUTF8));
+  return encodedValue;
 }
 
 @implementation OpenInChromeController
@@ -157,7 +161,8 @@ static NSString * encodeByAddingPercentEscapes(NSString *input) {
       [pasteboardData objectForKey:kVersionKey];
   NSNumber *value =
       [userPreferences objectForKey:kOpenInChromePreferenceKey];
-  return value ? [value integerValue] : kOpenInChromeNone;
+  return value ? (OpenInChromePreference)[value integerValue]
+               : kOpenInChromeNone;
 }
 
 #pragma mark - Private methods

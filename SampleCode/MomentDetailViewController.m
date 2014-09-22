@@ -1,3 +1,21 @@
+//
+//  MomentDetailViewController.m
+//
+//  Copyright 2013 Google Inc.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
 #import "MomentDetailViewController.h"
 
 #import <GoogleOpenSource/GoogleOpenSource.h>
@@ -98,6 +116,8 @@ enum {
 
     cell.textLabel.text = propertyName;
     cell.detailTextLabel.text = [self descriptionForObject:value];
+    cell.accessibilityIdentifier =
+        [NSString stringWithFormat:@"properties %@", cell.textLabel.text];
   } else {
     NSString *propertyName;
     if (indexPath.section == kTarget) {
@@ -110,6 +130,8 @@ enum {
     NSObject *value = [itemScope.JSON objectForKey:_targetProperties[indexPath.row]];
     cell.textLabel.text = _targetProperties[indexPath.row];
     cell.detailTextLabel.text = [value description];
+    cell.accessibilityIdentifier =
+        [NSString stringWithFormat:@"%@ %@", propertyName, cell.textLabel.text];
   }
 
   return cell;
@@ -137,6 +159,7 @@ enum {
   textView.text = cell.detailTextLabel.text;
   textView.font = [UIFont systemFontOfSize:16];
   textView.editable = NO;
+  textView.accessibilityIdentifier = @"textView";
   viewController.view = textView;
 
   [self.navigationController pushViewController:viewController animated:YES];

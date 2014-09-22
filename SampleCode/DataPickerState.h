@@ -1,5 +1,16 @@
 #import <Foundation/Foundation.h>
 
+// Dictionary Key indicating whether multiple selection is enabled.
+extern NSString * const kMultipleSelectKey;
+// Dictionary Key for the array of elements to be shown.
+extern NSString * const kElementsKey;
+// Dictionary Key for the label of each element.
+extern NSString * const kLabelKey;
+// Dictionary Key for the short label for each element (Optional).
+extern NSString * const kShortLabelKey;
+// Dictionary Key to indicate whether a particular element should be selected by default (Optional).
+extern NSString * const kSelectedKey;
+
 // DataPickerState objects keep track of the list of available cells and set
 // of selected cells that are being used in a DataPickerViewController object.
 @interface DataPickerState : NSObject

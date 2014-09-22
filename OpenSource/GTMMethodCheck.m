@@ -49,9 +49,10 @@ static BOOL ConformsToNSObjectProtocol(Class cls) {
        || (strcmp(className, "__IncompleteProtocol") == 0)
        || (strcmp(className, "__ARCLite__") == 0)
        || (strcmp(className, "WebMIMETypeRegistry") == 0)
-#if GTM_IPHONE_SDK
        || (strcmp(className, "Object") == 0)
+#if GTM_IPHONE_SDK
        || (strcmp(className, "UIKeyboardCandidateUtilities") == 0)
+       || (strcmp(className, "JSExport") == 0)
 #endif
     ) {
     return YES;
@@ -157,7 +158,9 @@ void GTMMethodCheckMethodChecker(void) {
           // COV_NF_END
         }
         if (methodCheckerInfo.dli_fbase == methodInfo.dli_fbase) {
-          objc_msgSend(cls, selector);
+          typedef void (*GTMMethodCheckMethod)(Class, SEL);
+          GTMMethodCheckMethod func = (GTMMethodCheckMethod)objc_msgSend;
+          func(cls, selector);
         }
       }
     }
