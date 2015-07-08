@@ -883,7 +883,7 @@ finishedRefreshWithFetcher:(GTMOAuth2Fetcher *)fetcher
 
   NSDictionary *responseHeaders = [fetcher responseHeaders];
   NSString *responseType = [responseHeaders valueForKey:@"Content-Type"];
-  BOOL isResponseJSON = [responseType hasPrefix:@"application/json"];
+  BOOL isResponseJSON = [responseType hasPrefix:@"application/json"] || [responseType hasPrefix:@"text/javascript"];
   BOOL hasData = ([data length] > 0);
 
   if (error) {
